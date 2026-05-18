@@ -1,0 +1,216 @@
+{
+  // ─────────────────────────────────────────────────────────────────────────
+  //  DevOps Power Container
+  //  VS Code / Cursor / GitHub Codespaces dev container specification
+  // ─────────────────────────────────────────────────────────────────────────
+  "name": "DevOps Power Container",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".",
+    "args": {
+      // Pin versions here so the whole team is aligned
+      "KUBECTL_VERSION": "v1.30.2",
+      "HELM_VERSION": "v3.15.2",
+      "TERRAFORM_VERSION": "1.9.1",
+      "VAULT_VERSION": "1.17.1",
+      "TRIVY_VERSION": "0.53.0",
+      "GO_VERSION": "1.22.5",
+      "NODE_VERSION": "20"
+    }
+  },
+  // ─── Container options ───────────────────────────────────────────────────
+  "remoteUser": "vscode",
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+  // ─── Docker-in-Docker / Docker socket ───────────────────────────────────
+  //  Option A — Socket pass-through (simpler, host Docker is used):
+  "mounts": [
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
+    // Persist shell history between rebuilds
+    "source=devops-zsh-history,target=/home/vscode/.zsh_history_dir,type=volume",
+    // Persist Go module cache
+    "source=devops-go-cache,target=/home/vscode/go/pkg,type=volume",
+    // Persist npm / node_modules cache
+    "source=devops-npm-cache,target=/home/vscode/.npm,type=volume",
+    // Persist pip cache
+    "source=devops-pip-cache,target=/home/vscode/.cache/pip,type=volume"
+  ],
+  // ─── Runtime environment ─────────────────────────────────────────────────
+  "remoteEnv": {
+    "TERM": "xterm-256color",
+    "COLORTERM": "truecolor",
+    "EDITOR": "nvim",
+    "PAGER": "bat --style=plain",
+    "DOCKER_BUILDKIT": "1",
+    "COMPOSE_DOCKER_CLI_BUILD": "1",
+    // Uncomment and set to override kubeconfig
+    // "KUBECONFIG": "/home/vscode/.kube/config",
+    "TF_LOG": "",
+    "TF_CLI_ARGS": ""
+  },
+  // ─── VS Code settings ────────────────────────────────────────────────────
+  "customizations": {
+    "vscode": {
+      "settings": {
+        // Terminal
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "terminal.integrated.fontSize": 14,
+        "terminal.integrated.fontFamily": "'MesloLGS NF', 'JetBrains Mono', 'Fira Code', monospace",
+        "terminal.integrated.cursorBlinking": true,
+        "terminal.integrated.cursorStyle": "line",
+        // Editor
+        "editor.fontFamily": "'JetBrains Mono', 'Fira Code', monospace",
+        "editor.fontSize": 14,
+        "editor.fontLigatures": true,
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true,
+        "editor.formatOnSave": true,
+        "editor.formatOnPaste": true,
+        "editor.bracketPairColorization.enabled": true,
+        "editor.guides.bracketPairs": "active",
+        "editor.suggest.preview": true,
+        "editor.minimap.enabled": false,
+        "editor.renderWhitespace": "boundary",
+        // Files
+        "files.trimTrailingWhitespace": true,
+        "files.insertFinalNewline": true,
+        "files.eol": "\n",
+        "files.associations": {
+          "*.tf": "terraform",
+          "*.tfvars": "terraform""*.hcl": "terraform",
+          "Dockerfile*": "dockerfile",
+          "*.yaml": "yaml",
+          "*.yml": "yaml",
+          "*.toml": "toml",
+          "*.env*": "dotenv"
+        },
+        "files.exclude": {
+          "**/.git": true,
+          "**/.DS_Store": true,
+          "**/node_modules": true,
+          "**/.terraform": true
+        },
+        // Git
+        "git.autofetch": true,
+        "git.enableSmartCommit": true,
+        "git.confirmSync": false,
+        // YAML
+        "yaml.schemas": {
+          "https://json.schemastore.org/github-workflow.json": ".github/workflows/*.{yml,yaml}",
+          "https://json.schemastore.org/github-action.json": "action.{yml,yaml}",
+          "https://json.schemastore.org/helm-chart.json": "Chart.{yml,yaml}",
+          "kubernetes": [
+            "/*.yaml",
+            "/*.yml",
+            "/k8s/**/*.yaml",
+            "/manifests/**/*.yaml"
+          ]
+        },
+        // Terraform
+        "terraform.experimentalFeatures.prefillRequiredFields": true,
+        "[terraform]": {
+          "editor.defaultFormatter": "hashicorp.terraform",
+          "editor.formatOnSave": true
+        },
+        "[terraform-vars]": {
+          "editor.defaultFormatter": "hashicorp.terraform",
+          "editor.formatOnSave": true
+        }
+      },
+      // ─── VS Code Extensions ───────────────────────────────────────────────
+      "extensions": [
+        // --- Container & Kubernetes ---
+        "ms-azuretools.vscode-docker",
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "mindaro.mindaro",
+        // --- Infrastructure as Code ---
+        "hashicorp.terraform",
+        "hashicorp.hcl",
+        "pulumi.pulumi-lsp-client",
+        // --- Cloud ---
+        "amazonwebservices.aws-toolkit-vscode",
+        "ms-vscode.azure-account",
+        "googlecloudtools.cloudcode",
+        // --- Languages ---
+        "golang.go",
+        "ms-python.python",
+        "ms-python.black-formatter",
+        "ms-python.isort",
+        "charliermarsh.ruff",
+        "ms-vscode.vscode-node-modules",
+        // --- YAML / JSON / TOML ---
+        "redhat.vscode-yaml",
+        "tamasfe.even-better-toml",
+        "ZainChen.one-json",
+        // --- Shell ---
+        "mads-hartmann.bash-ide-vscode",
+        "foxundermoon.shell-format",
+        "timonwong.shellcheck",
+        // --- Git ---
+        "eamodio.gitlens",
+        "mhutchie.git-graph",
+        "donjayamanne.githistory",
+        // --- Linting / Security ---
+        "exiasr.hadolint",
+        // --- Productivity ---
+        "streetsidesoftware.code-spell-checker",
+        "usernamehw.errorlens",
+        "oderwat.indent-rainbow",
+        "mechatroner.rainbow-csv",
+        "humao.rest-client",
+        "rangav.vscode-thunder-client",
+        "dotenv.dotenv-vscode",
+        // --- Theme & UI ---
+        "catppuccin.catppuccin-vsc",
+        "catppuccin.catppuccin-vsc-icons",
+        "aaron-bond.better-comments",
+        "vscode-icons-team.vscode-icons",
+        // --- AI ---
+        "github.copilot",
+        "github.copilot-chat"
+      ]
+    }
+  },
+  // ─── Lifecycle hooks ─────────────────────────────────────────────────────
+  "onCreateCommand": "sudo chown vscode:vscode /workspace || true",
+  "postStartCommand": "check-tools --summary",
+  "postAttachCommand": {
+    "pre-commit-install": "cd /workspace && git init 2>/dev/null; pre-commit install 2>/dev/null || true",
+    "motd": "cat /etc/motd 2>/dev/null || true"
+  },
+  // ─── Port forwarding ─────────────────────────────────────────────────────
+  "forwardPorts": [
+    3000, // Node / frontend dev server
+    4000, // Generic app
+    5000, // Flask / generic
+    8000, // Django / FastAPI
+    8080, // Generic HTTP
+    8443, // Generic HTTPS
+    9090, // Prometheus
+    3100, // Loki
+    16686, // Jaeger UI
+    8888 // Jupyter
+  ],
+  "portsAttributes": {
+    "3000": {
+      "label": "Frontend Dev Server",
+      "onAutoForward": "notify"
+    },
+    "8080": {
+      "label": "App HTTP",
+      "onAutoForward": "notify"
+    },
+    "9090": {
+      "label": "Prometheus",
+      "onAutoForward": "silent"
+    },
+    "3100": {
+      "label": "Loki",
+      "onAutoForward": "silent"
+    },
+    "16686": {
+      "label": "Jaeger UI",
+      "onAutoForward": "silent"
+    }
+  }
+}
