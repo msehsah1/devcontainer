@@ -1,0 +1,7 @@
+{
+  "id": "ai-devcontainer",
+  "version": "1.0.0",
+  "name": "AI Dev Container",
+  "description": "Ubuntu 22.04 with essential AI coding tools.",
+  "keywords": ["codex", "claude-code", "gemini-cli"]
+}
