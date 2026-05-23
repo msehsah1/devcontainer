@@ -3,7 +3,5 @@
   "version": "1.0.0",
   "name": "DevOps Dev Container",
   "description": "Ubuntu 22.04 with essential DevOps tools: kubectl, Helm, Terraform, AWS/Azure/GCP CLIs, Vault, and more.",
-  "documentationURL": "https://github.com/your-username/devops-container-template",
-  "categories": ["Other"],
   "keywords": ["devops", "kubernetes", "terraform", "docker", "cloud"]
 }
